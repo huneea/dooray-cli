@@ -54,6 +54,25 @@
 
 - [Claude Code로 앱 만들기 — 에이전트 하네스 활용법](https://www.youtube.com/watch?v=OvZiSEZpzxs)
 
+### 실제 생성된 산출물 경로
+
+이 프로젝트에서 실제로 생성된 파일들입니다. 하네스 엔지니어링을 적용할 때 참고하시면 됩니다.
+
+**컨텍스트 문서** (`docs/`)
+- [`docs/prd.md`](../docs/prd.md) — 제품 요구사항 정의
+- [`docs/flow.md`](../docs/flow.md) — 사용자 흐름
+- [`docs/data-schema.md`](../docs/data-schema.md) — 데이터 스키마 설계
+- [`docs/code-architecture.md`](../docs/code-architecture.md) — 코드 아키텍처
+- [`docs/adr.md`](../docs/adr.md) — 기술적 결정 기록 (ADR)
+
+**하네스 구조**
+- [`prompts/task-create.md`](../prompts/task-create.md) — Task/Phase 생성 가이드
+- [`scripts/run-phases.py`](../scripts/run-phases.py) — Phase 순차 실행 스크립트
+- [`tasks/implement-dooray-cli/`](../tasks/implement-dooray-cli/) — v0.1.0 구현 시 실제 사용된 8개 Phase 파일
+
+**스킬**
+- [`.claude/skills/plan-and-build/SKILL.md`](../.claude/skills/plan-and-build/SKILL.md) — 컨텍스트 빌딩 → 하네스 실행까지의 자동화 스킬
+
 ---
 
 ## 1. 양질의 컨텍스트 — 대화로 쌓기
