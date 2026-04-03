@@ -1,0 +1,12 @@
+# 빌드 결과물
+dist/
+node_modules/
+
+# TypeScript
+*.tsbuildinfo
+
+# OS
+.DS_Store
+
+#
+.omc

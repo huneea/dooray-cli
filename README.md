@@ -1,0 +1,138 @@
+# dooray-cli
+
+NHN Dooray REST API를 래핑한 CLI 도구입니다. 터미널과 AI 에이전트 환경에서 Dooray 업무를 관리할 수 있습니다.
+
+> A CLI tool wrapping the NHN Dooray REST API. Manage Dooray tasks from your terminal or AI agent workflows.
+
+## 설치 (Installation)
+
+```bash
+npm install -g @bifos/dooray-cli
+```
+
+## 초기 설정 (Setup)
+
+```bash
+dooray config set base-url https://api.dooray.com
+dooray config set api-key <YOUR_API_TOKEN>
+dooray doctor
+```
+
+API 토큰은 `https://{org}.dooray.com/setting/api/token`에서 발급할 수 있습니다.
+
+## 사용법 (Usage)
+
+### 프로젝트
+
+```bash
+dooray project list                        # 프로젝트 목록
+dooray project list --search ocr           # 코드로 검색
+dooray project members tc-ocr              # 멤버 목록
+dooray project workflows tc-ocr            # 워크플로우 목록
+```
+
+### 업무
+
+```bash
+dooray post list tc-ocr                    # 업무 목록 (최신순)
+dooray post search tc-ocr "키워드"          # 제목 검색
+dooray post get tc-ocr 42                  # 업무 상세
+dooray post get tc-ocr 42 --json           # JSON 출력
+```
+
+### 업무 생성
+
+```bash
+dooray post create tc-ocr \
+  --subject "업무 제목" \
+  --body "본문 마크다운" \
+  --to "담당자이름" \
+  --priority normal
+```
+
+### 업무 수정
+
+```bash
+# 대화형 ($EDITOR)
+dooray post edit tc-ocr 42
+
+# 비대화형 (AI 에이전트 친화)
+dooray post edit tc-ocr 42 --subject "새 제목" --body "새 본문"
+```
+
+### 댓글
+
+```bash
+dooray post comment list tc-ocr 42
+dooray post comment add tc-ocr 42 --body "댓글 내용"
+```
+
+### 상태 변경
+
+```bash
+dooray post done tc-ocr 42                 # 완료 처리
+dooray post workflow tc-ocr 42 "진행 중"    # 워크플로우 변경
+```
+
+### 위키
+
+```bash
+dooray wiki list                           # 위키 목록
+dooray wiki pages tc-ocr                   # 페이지 목록
+dooray wiki page get tc-ocr <page-id>      # 페이지 상세
+```
+
+## 출력 모드
+
+| 플래그 | 설명 | 용도 |
+|--------|------|------|
+| (없음) | 테이블 출력 | 사람이 읽기 좋음 |
+| `--json` | JSON 출력 | 파싱, 파이프라인 |
+| `--quiet` | ID만 출력 | 스크립팅 |
+
+```bash
+# 파이프라인 예시
+dooray post list tc-ocr --json | jq '.[] | select(.priority == "high")'
+dooray post list tc-ocr --quiet | xargs -I{} dooray post done tc-ocr {}
+```
+
+## AI 에이전트 연동
+
+`skills/dooray-cli/SKILL.md`에 AI 에이전트를 위한 스킬 파일이 포함되어 있습니다. Claude Code 등의 AI 에이전트에서 dooray-cli를 자동으로 활용할 수 있도록 의도→커맨드 매핑, 체이닝 예시, 에러 핸들링 가이드가 포함되어 있습니다.
+
+```bash
+# 스킬 파일 복사 (Claude Code 예시)
+cp -r skills/dooray-cli ~/.claude/skills/
+```
+
+## 캐시
+
+프로젝트, 멤버, 워크플로우 정보는 `~/.dooray/cache/`에 캐시됩니다.
+
+```bash
+dooray cache clear    # 캐시 삭제
+dooray doctor         # 캐시 상태 확인
+```
+
+## 기술 스택
+
+- TypeScript + Commander.js
+- ky (fetch 기반 HTTP 클라이언트)
+- tsup (esbuild 번들러)
+- chalk + cli-table3 (출력 포맷)
+
+## 개발
+
+```bash
+pnpm install
+pnpm run build
+node dist/index.js --help
+
+# 글로벌 링크
+pnpm link --global
+dooray --help
+```
+
+## 라이센스
+
+[MIT](LICENSE)

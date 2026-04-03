@@ -1,0 +1,13 @@
+src/
+docs/
+scripts/
+tasks/
+prompts/
+skills/
+.omc/
+*.tsbuildinfo
+tsconfig.json
+tsup.config.ts
+CLAUDE.md
+.claude/
+.github/
