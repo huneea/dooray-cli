@@ -26,9 +26,8 @@ export async function getConfigOrThrow(): Promise<Config> {
   const config = await getConfig();
   if (!config || !config.apiKey || !config.baseUrl) {
     throw new DoorayCliError(
-      "설정이 완료되지 않았습니다. 먼저 설정을 진행하세요:\n" +
-        "  dooray config set api-key <YOUR_API_KEY>\n" +
-        "  dooray config set base-url <YOUR_BASE_URL>",
+      "설정이 완료되지 않았습니다. 먼저 초기 설정을 진행하세요:\n" +
+        "  dooray setup",
       EXIT_CONFIG_ERROR,
     );
   }
@@ -68,15 +67,23 @@ export async function setConfigValue(
     case "smtp-host":
       config.smtpHost = value;
       break;
+    case "tenant-name":
+      config.tenantName = value;
+      break;
     case "smtp-port":
       config.smtpPort = parseInt(value, 10);
       break;
     default:
       throw new DoorayCliError(
-        `알 수 없는 설정 키: ${key}\n사용 가능한 키: api-key, base-url, imap-host, imap-port, imap-username, imap-password, smtp-host, smtp-port`,
+        `알 수 없는 설정 키: ${key}\n사용 가능한 키: api-key, base-url, tenant-name, imap-host, imap-port, imap-username, imap-password, smtp-host, smtp-port`,
         EXIT_CONFIG_ERROR,
       );
   }
 
+  await writeFile(CONFIG_PATH, JSON.stringify(config, null, 2) + "\n");
+}
+
+export async function saveConfig(config: Config): Promise<void> {
+  await ensureDir();
   await writeFile(CONFIG_PATH, JSON.stringify(config, null, 2) + "\n");
 }

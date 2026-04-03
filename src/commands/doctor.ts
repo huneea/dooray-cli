@@ -48,8 +48,7 @@ export const doctorCommand = new Command("doctor")
       console.log(chalk.green("✓ 기본 설정이 완료되었습니다."));
     } else {
       console.log(chalk.yellow("⚠ 설정이 필요합니다:"));
-      if (!apiKeyOk) console.log(chalk.yellow("  dooray config set api-key <YOUR_API_KEY>"));
-      if (!baseUrlOk) console.log(chalk.yellow("  dooray config set base-url <YOUR_BASE_URL>"));
+      console.log(chalk.yellow("  dooray setup"));
     }
     console.log();
   });

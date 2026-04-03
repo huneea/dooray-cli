@@ -1,18 +1,54 @@
 # User Flow — dooray-cli
 
-## 최초 설정
+## 최초 설정 — `dooray setup`
+
+대화형 마법사로 필수 설정을 한 번에 완료한다.
 
 ```
+dooray setup
+
+? 회사 테넌트명을 입력하세요 (Dooray 접속 URL에서 확인: https://{tenant}.dooray.com) (nhnent)
+? API Endpoint를 선택하세요 (화살표로 선택)
+❯ 민간 클라우드      https://api.dooray.com
+  공공 클라우드      https://api.gov-dooray.com
+  공공 업무망 클라우드 https://api.gov-dooray.co.kr
+  금융 클라우드      https://api.dooray.co.kr
+? API Key를 입력하세요 (발급: https://nhnent.dooray.com/setting/api/token) ****
+
+✓ API 연결 성공 (홍길동)
+
+? 메일 기능을 사용하시겠습니까? (Y/n) Y
+? IMAP 사용자 이메일 (설정 확인: https://nhnent.dooray.com/setting/mail/general/read) user@nhn.com
+? IMAP 비밀번호 ****
+
+✓ 설정 완료. dooray doctor로 상태를 확인할 수 있습니다.
+```
+
+플로우:
+1. 테넌트명 입력 (기본값: `nhnent`) → API Key 발급·메일 설정 링크에 자동 반영
+2. API Endpoint 선택 (4개 환경 중 택 1, 기본: 민간)
+3. API Key 입력 (마스킹, 발급 링크 안내)
+4. API 연결 테스트 → 실패 시 재입력 유도
+5. 메일 사용 여부 → Y: IMAP 계정·비밀번호 입력 / n: 건너뛰기
+6. 모든 입력 완료 후 config.json에 한 번에 저장 (Ctrl+C 시 저장 안 됨)
+
+재실행 시 기존 설정값이 기본값으로 표시된다.
+
+config 미설정 상태에서 다른 커맨드 실행 시:
+
+```
+설정이 완료되지 않았습니다. 먼저 초기 설정을 진행하세요:
+  dooray setup
+```
+
+### 수동 설정 (개별 키)
+
+기존 `dooray config set/get` 커맨드로도 개별 설정이 가능하다.
+
+```
+dooray config set api-key <token>
 dooray config set base-url https://api.dooray.com
-dooray config set api-key <token>          # https://{company}.dooray.com/setting/api/token
-dooray doctor                               # 설정·연결 검증
-```
-
-config 미설정 상태에서 어떤 커맨드 실행 시:
-
-```
-Error: API key not configured.
-Run: dooray config set api-key <your-key>
+dooray doctor
 ```
 
 ## 일반 조회 흐름

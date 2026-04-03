@@ -3,6 +3,7 @@ import chalk from "chalk";
 import { configCommand } from "./commands/config.js";
 import { cacheCommand } from "./commands/cache.js";
 import { doctorCommand } from "./commands/doctor.js";
+import { setupCommand } from "./commands/setup.js";
 import { projectListCommand } from "./commands/project/list.js";
 import { projectMembersCommand } from "./commands/project/members.js";
 import { projectWorkflowsCommand } from "./commands/project/workflows.js";
@@ -103,6 +104,7 @@ mailCommand.addCommand(mailGetCommand);
 mailCommand.addCommand(mailSendCommand);
 mailCommand.addCommand(mailReplyCommand);
 
+program.addCommand(setupCommand);
 program.addCommand(configCommand);
 program.addCommand(cacheCommand);
 program.addCommand(doctorCommand);

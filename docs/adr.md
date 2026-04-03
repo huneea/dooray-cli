@@ -209,7 +209,34 @@
 - 2차 요청 시 동일한 Authorization 헤더 첨부
 - 업로드: FormData + Blob, 다운로드: ArrayBuffer로 수신 후 파일 저장
 
-## ADR-016: api/types.ts 단일 파일 유지
+## ADR-016: `dooray setup` 대화형 초기 설정 마법사
+
+**결정**: `dooray setup` 커맨드로 대화형 초기 설정 마법사 제공. `postinstall` 훅 대신 명시적 커맨드 방식 채택.
+
+**이유**:
+
+- `postinstall`은 CI/Docker 등 non-TTY 환경에서 실패, npm 정책상 interactive postinstall 비권장
+- `dooray setup`은 언제든 재실행 가능, config 미설정 시 안내 메시지로 유도
+- 재실행 시 기존 설정값을 기본값으로 표시하여 부분 수정 가능
+
+**플로우**:
+
+1. 테넌트명 입력 (기본값: `nhnent`) — API Key 발급 링크·메일 설정 링크 생성에 사용
+2. API Endpoint 선택 (4개 환경: 민간·공공·공공업무망·금융, 기본: 민간)
+3. API Key 입력 (마스킹, 발급 링크 안내)
+4. API 연결 테스트 → 실패 시 재입력 유도
+5. 메일 사용 여부 → Y: IMAP 계정·비밀번호 입력 / n: 건너뛰기
+6. 전체 입력 완료 후 config.json에 한 번에 저장 (all-or-nothing)
+
+**라이브러리**: `@inquirer/prompts` — 선택(select), 입력(input), 비밀번호(password), 확인(confirm) 프롬프트 지원. tsup CJS 번들 호환성 확인 필요.
+
+**안전성**: Ctrl+C 시 config 파일 미저장 (부분 저장 방지). 모든 입력을 메모리에 수집한 뒤 마지막에 한 번만 writeFile.
+
+**config 미설정 시 안내**: 기존 에러 메시지를 `dooray setup` 실행 유도로 변경.
+
+---
+
+## ADR-017: api/types.ts 단일 파일 유지
 
 **결정**: `api/types.ts`를 도메인별로 분리하지 않고 단일 파일로 유지
 

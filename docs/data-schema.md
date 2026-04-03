@@ -19,8 +19,9 @@
 ```typescript
 interface Config {
   version: 1;
+  tenantName?: string;     // 회사 테넌트명 (e.g. "nhnent"), 기본값: "nhnent"
   apiKey: string;          // Dooray API 토큰
-  baseUrl: string;         // 기본값: "https://api.dooray.com"
+  baseUrl: string;         // API Endpoint, 4개 환경 중 택 1
   imapHost?: string;       // 기본값: "imap.dooray.com"
   imapPort?: number;       // 기본값: 993
   imapUsername?: string;    // IMAP 로그인 이메일 (필수)
@@ -28,9 +29,19 @@ interface Config {
   smtpHost?: string;       // 기본값: "smtp.dooray.com"
   smtpPort?: number;       // 기본값: 465
 }
+
+// API Endpoint 선택지
+const API_ENDPOINTS = {
+  "민간 클라우드":       "https://api.dooray.com",
+  "공공 클라우드":       "https://api.gov-dooray.com",
+  "공공 업무망 클라우드": "https://api.gov-dooray.co.kr",
+  "금융 클라우드":       "https://api.dooray.co.kr",
+} as const;
 ```
 
-- 미설정 키 접근 시 에러 + 설정 안내 출력
+- `tenantName`은 API Key 발급 링크(`https://{tenant}.dooray.com/setting/api/token`)와 메일 설정 링크 생성에 사용
+- `baseUrl`은 4개 환경 중 하나로 고정 (자유 입력 아님)
+- 미설정 키 접근 시 에러 + `dooray setup` 안내 출력
 - env var 폴백 없음 (보안 원칙)
 - IMAP/SMTP 서버 정보는 기본값 제공. 사용자는 username/password만 설정하면 됨
 

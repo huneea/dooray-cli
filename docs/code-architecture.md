@@ -10,6 +10,7 @@
 | 빌드            | tsup (esbuild, 단일 번들)             |
 | 출력 포맷       | chalk (색상), cli-table3 (테이블)     |
 | 로딩            | ora (스피너)                          |
+| 대화형 프롬프트 | @inquirer/prompts (setup 마법사)      |
 | 에디터 연동     | js-yaml (frontmatter), tmp (임시파일) |
 | IMAP 클라이언트 | imapflow (메일 조회)                  |
 | SMTP 클라이언트 | nodemailer (메일 발송)                |
@@ -57,6 +58,7 @@ src/
     exit-codes.ts           # 0 성공 / 1 API오류 / 2 인증실패 / 3 파라미터오류 / 4 설정오류
 
   commands/
+    setup.ts                # dooray setup — 대화형 초기 설정 마법사
     config.ts               # dooray config set|get
     doctor.ts               # dooray doctor
     cache.ts                # dooray cache clear|refresh
@@ -109,6 +111,7 @@ commands/* → utils/errors
 editor/    → api/client (현재 데이터 fetch) + resolvers/member
 ```
 
+- `commands/setup.ts`는 config/store + api/client + @inquirer/prompts 의존
 - `api/client`는 순수 HTTP 래퍼. 비즈니스 로직 없음
 - `resolvers/*`는 캐시 우선 조회, 만료 시 api/client 호출
 - `commands/*`는 resolvers + api/client + formatters 조합
