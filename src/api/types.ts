@@ -141,6 +141,12 @@ export interface PostFileDetail {
 export type PostFileListResponse = DoorayApiResponse<PostFileDetail[]>;
 export type PostFileMetaResponse = DoorayApiResponse<PostFileDetail>;
 
+export interface UploadFileResult {
+  id: string;
+}
+
+export type UploadFileResponse = DoorayApiResponse<UploadFileResult>;
+
 export interface Post {
   id: string;
   subject: string;

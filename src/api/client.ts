@@ -33,6 +33,7 @@ import type {
   DoorayErrorResponse,
   PostFileListResponse,
   PostFileMetaResponse,
+  UploadFileResponse,
 } from "./types.js";
 
 export interface GetPostsParams {
@@ -106,9 +107,11 @@ async function toDoorayCliError(error: unknown): Promise<never> {
 export class DoorayApiClient {
   private readonly api: KyInstance;
   private readonly authHeader: string;
+  private readonly baseUrl: string;
 
   constructor(apiKey: string, baseUrl: string) {
     this.authHeader = `dooray-api ${apiKey}`;
+    this.baseUrl = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
     this.api = ky.create({
       prefixUrl: baseUrl,
       headers: {
@@ -409,7 +412,9 @@ export class DoorayApiClient {
   async getPostFileMeta(projectId: string, postId: string, fileId: string): Promise<PostFileMetaResponse> {
     try {
       return await this.api
-        .get(`project/v1/projects/${projectId}/posts/${postId}/files/${fileId}`)
+        .get(`project/v1/projects/${projectId}/posts/${postId}/files/${fileId}`, {
+          searchParams: { media: "meta" },
+        })
         .json<PostFileMetaResponse>();
     } catch (e) {
       return toDoorayCliError(e);
@@ -419,8 +424,10 @@ export class DoorayApiClient {
   async downloadPostFile(projectId: string, postId: string, fileId: string): Promise<{ buffer: ArrayBuffer; fileName: string }> {
     try {
       const res = await this.api
-        .get(`project/v1/projects/${projectId}/posts/${postId}/files/${fileId}/downloads`, {
+        .get(`project/v1/projects/${projectId}/posts/${postId}/files/${fileId}`, {
+          searchParams: { media: "raw" },
           redirect: "manual",
+          throwHttpErrors: false,
         });
 
       const location = res.headers.get("location");
@@ -428,9 +435,13 @@ export class DoorayApiClient {
         throw new DoorayCliError("파일 다운로드 리다이렉트 URL을 받지 못했습니다.", EXIT_API_ERROR);
       }
 
-      const fileRes = await ky.get(location, {
+      const fileRes = await fetch(location, {
         headers: { Authorization: this.authHeader },
       });
+
+      if (!fileRes.ok) {
+        throw new DoorayCliError(`파일 다운로드 실패 (${fileRes.status})`, EXIT_API_ERROR);
+      }
 
       const disposition = fileRes.headers.get("content-disposition");
       let fileName = `file-${fileId}`;
@@ -447,35 +458,46 @@ export class DoorayApiClient {
     }
   }
 
-  async uploadPostFile(projectId: string, postId: string, filePath: string): Promise<PostFileMetaResponse> {
+  async uploadPostFile(projectId: string, postId: string, filePath: string): Promise<UploadFileResponse> {
     try {
       const fileName = basename(filePath);
       const fileBuffer = await readFile(filePath);
-      const fileStat = await stat(filePath);
-
-      const res = await this.api
-        .post(`project/v1/projects/${projectId}/posts/${postId}/files`, {
-          redirect: "manual",
-          json: {
-            name: fileName,
-            size: fileStat.size,
-          },
-        });
-
-      const location = res.headers.get("location");
-      if (!location) {
-        throw new DoorayCliError("파일 업로드 리다이렉트 URL을 받지 못했습니다.", EXIT_API_ERROR);
-      }
 
       const formData = new FormData();
       formData.append("file", new Blob([fileBuffer]), fileName);
 
-      const uploadRes = await ky.post(location, {
+      const url = `${this.baseUrl}project/v1/projects/${projectId}/posts/${postId}/files`;
+      const res = await fetch(url, {
+        method: "POST",
         headers: { Authorization: this.authHeader },
         body: formData,
+        redirect: "manual",
       });
 
-      return await uploadRes.json<PostFileMetaResponse>();
+      if (res.status === 307) {
+        const location = res.headers.get("location");
+        if (!location) {
+          throw new DoorayCliError("파일 업로드 리다이렉트 URL을 받지 못했습니다.", EXIT_API_ERROR);
+        }
+
+        const uploadRes = await fetch(location, {
+          method: "POST",
+          headers: { Authorization: this.authHeader },
+          body: formData,
+        });
+
+        if (!uploadRes.ok) {
+          throw new DoorayCliError(`파일 업로드 실패 (${uploadRes.status})`, EXIT_API_ERROR);
+        }
+
+        return await uploadRes.json() as UploadFileResponse;
+      }
+
+      if (!res.ok) {
+        throw new DoorayCliError(`파일 업로드 실패 (${res.status})`, EXIT_API_ERROR);
+      }
+
+      return await res.json() as UploadFileResponse;
     } catch (e) {
       if (e instanceof DoorayCliError) throw e;
       return toDoorayCliError(e);

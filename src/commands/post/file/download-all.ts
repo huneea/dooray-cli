@@ -16,7 +16,7 @@ export const fileDownloadAllCommand = new Command("download-all")
     const config = await getConfigOrThrow();
     const client = new DoorayApiClient(config.apiKey, config.baseUrl);
 
-    startSpinner("첨부파일 목록 조회 중...");
+    const spinner = startSpinner("첨부파일 목록 조회 중...");
     const projectId = await resolveProject(client, project);
     const postId = await resolvePost(client, projectId, Number(postNumberStr));
     const res = await client.getPostFiles(projectId, postId);
@@ -31,8 +31,7 @@ export const fileDownloadAllCommand = new Command("download-all")
 
     const downloaded: string[] = [];
     for (const file of res.result) {
-      stopSpinner(false);
-      startSpinner(`다운로드 중: ${file.name}...`);
+      spinner.text = `다운로드 중: ${file.name} (${downloaded.length + 1}/${res.result.length})`;
       const { buffer, fileName } = await client.downloadPostFile(projectId, postId, file.id);
       const outputPath = join(opts.output, fileName);
       await writeFile(outputPath, Buffer.from(buffer));

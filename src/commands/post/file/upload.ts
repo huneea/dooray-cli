@@ -3,6 +3,7 @@ import { getConfigOrThrow } from "../../../config/store.js";
 import { DoorayApiClient } from "../../../api/client.js";
 import { resolveProject } from "../../../resolvers/project.js";
 import { resolvePost } from "../../../resolvers/post.js";
+import { basename } from "node:path";
 import type { OutputOptions } from "../../../formatters/table.js";
 import { printJson } from "../../../formatters/table.js";
 import { startSpinner, stopSpinner } from "../../../utils/spinner.js";
@@ -28,6 +29,6 @@ export const fileUploadCommand = new Command("upload")
     } else if (globalOpts.quiet) {
       process.stdout.write(`${res.result.id}\n`);
     } else {
-      process.stdout.write(`파일 업로드 완료: ${res.result.name} (ID: ${res.result.id})\n`);
+      process.stdout.write(`파일 업로드 완료: ${basename(filePath)} (ID: ${res.result.id})\n`);
     }
   });
