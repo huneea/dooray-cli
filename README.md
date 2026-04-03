@@ -12,13 +12,22 @@ npm install -g @bifos/dooray-cli
 
 ## 초기 설정 (Setup)
 
+대화형 마법사로 한 번에 설정할 수 있습니다:
+
+```bash
+dooray setup
+```
+
+API Endpoint 선택 → API Key 입력 → 연결 테스트 → 메일 설정(선택)을 순서대로 진행합니다.
+API 토큰은 `https://{tenant}.dooray.com/setting/api/token`에서 발급할 수 있습니다.
+
+수동 설정도 가능합니다:
+
 ```bash
 dooray config set base-url https://api.dooray.com
 dooray config set api-key <YOUR_API_TOKEN>
 dooray doctor
 ```
-
-API 토큰은 `https://{org}.dooray.com/setting/api/token`에서 발급할 수 있습니다.
 
 ## 사용법 (Usage)
 
@@ -80,14 +89,16 @@ dooray post workflow tc-ocr 42 "진행 중"    # 워크플로우 변경
 dooray wiki list                           # 위키 목록
 dooray wiki pages tc-ocr                   # 페이지 목록
 dooray wiki page get tc-ocr <page-id>      # 페이지 상세
+dooray wiki page create tc-ocr             # 페이지 생성 ($EDITOR)
+dooray wiki page edit tc-ocr <page-id>     # 페이지 수정 ($EDITOR)
 ```
 
 ### 메일
 
-IMAP을 통해 Dooray 메일을 조회할 수 있습니다.
+IMAP을 통해 Dooray 메일을 조회할 수 있습니다. 메일 설정은 `dooray setup`에서 한 번에 진행하거나, 수동으로 설정할 수 있습니다.
 
 ```bash
-# 초기 설정 (서버 정보는 기본값 제공)
+# 수동 설정 (dooray setup 사용 시 불필요)
 dooray config set imap-username your@email.com
 dooray config set imap-password <IMAP_APP_PASSWORD>
 
@@ -166,6 +177,7 @@ dooray doctor         # 캐시 상태 확인
 
 - TypeScript + Commander.js
 - ky (fetch 기반 HTTP 클라이언트)
+- @inquirer/prompts (대화형 설정 마법사)
 - tsup (esbuild 번들러)
 - chalk + cli-table3 (출력 포맷)
 
