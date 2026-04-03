@@ -5,6 +5,8 @@ export default defineConfig({
   format: ["cjs"],
   target: "node18",
   clean: true,
+  noExternal: [],
+  external: ["imapflow", "mailparser", "nodemailer"],
   banner: {
     js: "#!/usr/bin/env node",
   },

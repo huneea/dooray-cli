@@ -11,6 +11,9 @@
 | 출력 포맷       | chalk (색상), cli-table3 (테이블)     |
 | 로딩            | ora (스피너)                          |
 | 에디터 연동     | js-yaml (frontmatter), tmp (임시파일) |
+| IMAP 클라이언트 | imapflow (메일 조회)                  |
+| SMTP 클라이언트 | nodemailer (메일 발송)                |
+| 메일 파서       | mailparser (메일 본문 파싱)           |
 
 ## 디렉터리 구조
 
@@ -20,6 +23,8 @@ src/
 
   api/
     client.ts               # DoorayApiClient — ky 기반 HTTP 래퍼
+    imapClient.ts           # IMAP 메일 조회 (imapflow + mailparser)
+    smtpClient.ts           # SMTP 메일 발송 (nodemailer)
     types.ts                # 모든 API 요청/응답 타입
 
   resolvers/
@@ -81,6 +86,12 @@ src/
       page-get.ts
       page-create.ts
       page-edit.ts          # $EDITOR 기반
+
+    mail/
+      list.ts               # 메일 목록 (--unread, --search)
+      get.ts                # 메일 상세 조회
+      send.ts               # 메일 발송 (--to, --cc, --bcc, --html)
+      reply.ts              # 메일 답장 (In-Reply-To 스레드 유지)
 ```
 
 ## 모듈 의존 관계

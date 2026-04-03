@@ -82,6 +82,32 @@ dooray wiki pages tc-ocr                   # 페이지 목록
 dooray wiki page get tc-ocr <page-id>      # 페이지 상세
 ```
 
+### 메일
+
+IMAP을 통해 Dooray 메일을 조회할 수 있습니다.
+
+```bash
+# 초기 설정 (서버 정보는 기본값 제공)
+dooray config set imap-username your@email.com
+dooray config set imap-password <IMAP_APP_PASSWORD>
+
+# 메일 조회
+dooray mail list                           # 최근 메일 목록
+dooray mail list --unread                  # 안읽은 메일만
+dooray mail list --search "키워드"          # 제목 검색
+dooray mail list --size 50                 # 조회 개수 지정
+dooray mail get <uid>                      # 메일 상세
+dooray mail get <uid> --json               # JSON 출력
+
+# 메일 발송
+dooray mail send --to "user@example.com" --subject "제목" --body "본문"
+dooray mail send --to "a@b.com" --cc "c@d.com" --subject "제목" --body-file ./content.md
+dooray mail send --to "a@b.com" --subject "HTML 메일" --body "<h1>Hello</h1>" --html
+
+# 메일 답장 (스레드 유지)
+dooray mail reply <uid> --body "답장 내용"
+```
+
 ## 출력 모드
 
 | 플래그 | 설명 | 용도 |

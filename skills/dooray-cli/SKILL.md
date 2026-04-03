@@ -56,6 +56,12 @@ dooray doctor                                 # 설정 검증
 | 위키 페이지 목록 | `dooray wiki pages <project>` |
 | 위키 페이지 상세 | `dooray wiki page get <project> <page-id>` |
 | 위키 페이지 생성 | `dooray wiki page create <project> --subject "..." --body "..."` |
+| 메일 목록 조회 | `dooray mail list` |
+| 안읽은 메일 | `dooray mail list --unread` |
+| 메일 제목 검색 | `dooray mail list --search "<keyword>"` |
+| 메일 상세 | `dooray mail get <uid>` |
+| 메일 발송 | `dooray mail send --to "..." --subject "..." --body "..."` |
+| 메일 답장 | `dooray mail reply <uid> --body "..."` |
 
 ---
 

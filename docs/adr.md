@@ -139,3 +139,55 @@
 - `doctor` 실행 시 자동 캐싱 → 이후 커맨드에서 현재 사용자 정보 즉시 참조 가능
 - TTL 24h (사용자 정보는 거의 불변)
 - post 생성 시 `from` 자동 설정 등 향후 확장 기반
+
+---
+
+## ADR-012: IMAP 메일 연동
+
+**결정**: Dooray IMAP 서버(imap.dooray.com)를 통해 메일 조회 기능 추가
+
+**이유**:
+
+- Dooray는 공식 메일 API를 제공하지 않으나 IMAP/SMTP를 지원
+- 주간 업무 알림, 일정 알림 등 메일을 CLI에서 확인하여 생산성 향상
+- `imapflow` (IMAP) + `mailparser` (파싱) 조합으로 구현
+
+**서버 특성**:
+
+- `SINCE` 날짜 검색 미지원 (서버 파서 버그)
+- `SORT` 미지원 → UID 역순(최신순)으로 대체
+- `SUBJECT`, `FROM`, `TO`, `UNSEEN`, `SEEN` 검색은 지원
+
+**기본값 전략**: imap-host, imap-port, smtp-host, smtp-port는 기본값 제공 (Dooray 사용자 대다수 동일). 사용자는 imap-username, imap-password만 설정하면 됨.
+
+**트레이드오프**: imapflow + mailparser 의존성 추가 → tsup에서 external 처리 필요 (번들 미포함, node_modules에서 로드)
+
+---
+
+## ADR-013: SMTP 메일 발송
+
+**결정**: nodemailer를 사용하여 Dooray SMTP(smtp.dooray.com:465)로 메일 발송
+
+**이유**:
+
+- 메일 조회(IMAP)만으로는 반쪽짜리 기능 → 발송까지 지원해야 CLI에서 메일 워크플로우 완결
+- nodemailer는 Node.js 메일 발송 de facto 표준 (성숙, 안정)
+- SMTP 인증은 IMAP과 동일한 자격증명 사용 → 추가 설정 불필요
+
+**지원 기능**: send (to/cc/bcc/subject/body/html), reply (In-Reply-To로 스레드 유지)
+
+**추후 고민**: 첨부파일(`--attach`) 지원
+
+---
+
+## ADR-014: TypeScript Path Alias 보류
+
+**결정**: `@/` 등 path alias 도입 보류
+
+**이유**:
+
+- 현재 `src/` 최대 깊이 3단계 (`commands/post/comment/`) → `../../`까지가 최대로 관리 가능한 수준
+- tsup(esbuild)이 `tsconfig.json` paths를 자동 resolve하지 않아 별도 플러그인 필요 → 빌드 파이프라인 복잡도 증가
+- 프로젝트 규모 대비 실익이 크지 않음
+
+**재검토 시점**: 디렉토리 깊이가 4단계 이상으로 증가하거나 대규모 리팩토링 시

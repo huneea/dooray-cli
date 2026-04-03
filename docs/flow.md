@@ -37,8 +37,8 @@ dooray post create my-project \
 
 ```
 Error: '김' matches multiple members:
-  - 김철수 (3421415092208840539)
-  - 김영희 (2335693001485109802)
+  - 김철수 (1234567890123456789)
+  - 김영희 (9876543210987654321)
 Use full name or ID.
 ```
 

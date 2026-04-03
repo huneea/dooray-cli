@@ -22,6 +22,10 @@ import { wikiPagesCommand } from "./commands/wiki/pages.js";
 import { wikiPageGetCommand } from "./commands/wiki/page-get.js";
 import { wikiPageCreateCommand } from "./commands/wiki/page-create.js";
 import { wikiPageEditCommand } from "./commands/wiki/page-edit.js";
+import { mailListCommand } from "./commands/mail/list.js";
+import { mailGetCommand } from "./commands/mail/get.js";
+import { mailSendCommand } from "./commands/mail/send.js";
+import { mailReplyCommand } from "./commands/mail/reply.js";
 import { DoorayCliError } from "./utils/errors.js";
 
 const program = new Command();
@@ -29,7 +33,7 @@ const program = new Command();
 program
   .name("dooray")
   .description("Dooray REST API CLI")
-  .version("0.1.0")
+  .version("0.2.0")
   .option("--json", "JSON 형식으로 출력")
   .option("--quiet", "ID만 출력")
   .option("--no-color", "색상 비활성화");
@@ -78,12 +82,20 @@ wikiPageCommand.addCommand(wikiPageCreateCommand);
 wikiPageCommand.addCommand(wikiPageEditCommand);
 wikiCommand.addCommand(wikiPageCommand);
 
+// mail 커맨드 그룹
+const mailCommand = new Command("mail").description("메일 관련 명령");
+mailCommand.addCommand(mailListCommand);
+mailCommand.addCommand(mailGetCommand);
+mailCommand.addCommand(mailSendCommand);
+mailCommand.addCommand(mailReplyCommand);
+
 program.addCommand(configCommand);
 program.addCommand(cacheCommand);
 program.addCommand(doctorCommand);
 program.addCommand(projectCommand);
 program.addCommand(postCommand);
 program.addCommand(wikiCommand);
+program.addCommand(mailCommand);
 
 program.parseAsync().catch((err) => {
   if (err instanceof DoorayCliError) {

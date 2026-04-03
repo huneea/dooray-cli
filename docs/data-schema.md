@@ -19,13 +19,20 @@
 ```typescript
 interface Config {
   version: 1;
-  apiKey: string; // Dooray API 토큰
-  baseUrl: string; // e.g. "https://api.dooray.com"
+  apiKey: string;          // Dooray API 토큰
+  baseUrl: string;         // 기본값: "https://api.dooray.com"
+  imapHost?: string;       // 기본값: "imap.dooray.com"
+  imapPort?: number;       // 기본값: 993
+  imapUsername?: string;    // IMAP 로그인 이메일 (필수)
+  imapPassword?: string;   // IMAP 앱 비밀번호 (필수)
+  smtpHost?: string;       // 기본값: "smtp.dooray.com"
+  smtpPort?: number;       // 기본값: 465
 }
 ```
 
 - 미설정 키 접근 시 에러 + 설정 안내 출력
 - env var 폴백 없음 (보안 원칙)
+- IMAP/SMTP 서버 정보는 기본값 제공. 사용자는 username/password만 설정하면 됨
 
 ---
 

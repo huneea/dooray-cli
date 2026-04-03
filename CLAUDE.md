@@ -19,11 +19,12 @@ dooray                # 글로벌 링크 시
 src/
   index.ts              # CLI entrypoint
   api/client.ts         # DoorayApiClient (ky 기반)
+  api/imapClient.ts     # IMAP 메일 조회 (imapflow + mailparser)
   api/types.ts          # API 요청/응답 타입
   cache/store.ts        # ~/.dooray/cache/ 디렉토리 기반 캐시 CRUD
   cache/types.ts        # CacheEntry, Cached* 타입
   resolvers/            # me, project, member, workflow, post, wiki resolver
-  commands/             # Commander.js 커맨드 (project, post, wiki, config, cache, doctor)
+  commands/             # Commander.js 커맨드 (project, post, wiki, mail, config, cache, doctor)
   editor/index.ts       # $EDITOR 연동 + YAML frontmatter 파싱
   formatters/           # 테이블/JSON/quiet 출력
   utils/                # errors, spinner, exit-codes

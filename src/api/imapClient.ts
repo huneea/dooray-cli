@@ -1,0 +1,146 @@
+import { ImapFlow } from "imapflow";
+import { simpleParser } from "mailparser";
+import type { Config } from "../config/types.js";
+import { DEFAULTS } from "../config/types.js";
+import { DoorayCliError } from "../utils/errors.js";
+import { EXIT_CONFIG_ERROR } from "../utils/exit-codes.js";
+
+export interface MailMessage {
+  uid: number;
+  subject: string;
+  from: string;
+  to: string[];
+  date: Date | null;
+  isRead: boolean;
+  body?: string;
+}
+
+export function getImapConfigOrThrow(config: Config) {
+  if (!config.imapUsername || !config.imapPassword) {
+    throw new DoorayCliError(
+      "IMAP 설정이 완료되지 않았습니다. 먼저 설정을 진행하세요:\n" +
+        "  dooray config set imap-username <YOUR_EMAIL>\n" +
+        "  dooray config set imap-password <YOUR_IMAP_PASSWORD>",
+      EXIT_CONFIG_ERROR,
+    );
+  }
+  return {
+    host: config.imapHost ?? DEFAULTS.imapHost,
+    port: config.imapPort ?? DEFAULTS.imapPort,
+    username: config.imapUsername,
+    password: config.imapPassword,
+  };
+}
+
+function createClient(config: Config): ImapFlow {
+  const imap = getImapConfigOrThrow(config);
+  return new ImapFlow({
+    host: imap.host,
+    port: imap.port,
+    secure: true,
+    auth: { user: imap.username, pass: imap.password },
+    logger: false,
+  });
+}
+
+export async function listMails(
+  config: Config,
+  opts: { unread?: boolean; search?: string; limit?: number },
+): Promise<MailMessage[]> {
+  const client = createClient(config);
+  const limit = opts.limit ?? 20;
+
+  try {
+    await client.connect();
+    const lock = await client.getMailboxLock("INBOX");
+
+    try {
+      // Build search query
+      const query: Record<string, unknown> = {};
+      if (opts.unread) query.seen = false;
+      if (opts.search) query.subject = opts.search;
+      if (Object.keys(query).length === 0) query.all = true;
+
+      const uids = await client.search(query, { uid: true });
+      if (uids.length === 0) return [];
+
+      // Take latest N UIDs (highest UID = newest)
+      const sorted = uids.sort((a, b) => b - a).slice(0, limit);
+      const uidSet = sorted.join(",");
+
+      const messages: MailMessage[] = [];
+      for await (const msg of client.fetch(uidSet, {
+        uid: true,
+        flags: true,
+        envelope: true,
+      }, { uid: true })) {
+        messages.push({
+          uid: msg.uid,
+          subject: msg.envelope.subject ?? "(제목 없음)",
+          from: msg.envelope.from?.[0]
+            ? `${msg.envelope.from[0].name || ""} <${msg.envelope.from[0].address || ""}>`
+            : "(unknown)",
+          to: (msg.envelope.to ?? []).map(
+            (t) => `${t.name || ""} <${t.address || ""}>`,
+          ),
+          date: msg.envelope.date ?? null,
+          isRead: msg.flags.has("\\Seen"),
+        });
+      }
+
+      // Sort by UID descending (newest first)
+      messages.sort((a, b) => b.uid - a.uid);
+      return messages;
+    } finally {
+      lock.release();
+    }
+  } finally {
+    await client.logout();
+  }
+}
+
+export async function getMail(
+  config: Config,
+  uid: number,
+): Promise<MailMessage & { body: string }> {
+  const client = createClient(config);
+
+  try {
+    await client.connect();
+    const lock = await client.getMailboxLock("INBOX");
+
+    try {
+      const msg = await client.fetchOne(String(uid), {
+        uid: true,
+        flags: true,
+        envelope: true,
+        source: true,
+      }, { uid: true });
+
+      if (!msg) {
+        throw new DoorayCliError(`메일을 찾을 수 없습니다: UID ${uid}`, 1);
+      }
+
+      const parsed = await simpleParser(msg.source);
+      const body = parsed.text ?? parsed.html ?? "(본문 없음)";
+
+      return {
+        uid: msg.uid,
+        subject: msg.envelope.subject ?? "(제목 없음)",
+        from: msg.envelope.from?.[0]
+          ? `${msg.envelope.from[0].name || ""} <${msg.envelope.from[0].address || ""}>`
+          : "(unknown)",
+        to: (msg.envelope.to ?? []).map(
+          (t) => `${t.name || ""} <${t.address || ""}>`,
+        ),
+        date: msg.envelope.date ?? null,
+        isRead: msg.flags.has("\\Seen"),
+        body,
+      };
+    } finally {
+      lock.release();
+    }
+  } finally {
+    await client.logout();
+  }
+}
