@@ -30,6 +30,11 @@ src/
   utils/                # errors, spinner, exit-codes
 ```
 
+## 스킬 폴더 구분
+
+- `skills/` — 공개 스킬. 다른 사용자가 dooray-cli 사용법을 참고하기 위한 스킬 파일 (예: `skills/dooray-cli/SKILL.md`)
+- `.claude/skills/` — 내부 스킬. Claude Code가 실제로 로드하여 실행하는 개발 워크플로우 스킬 (예: `/release`)
+
 ## 코드 컨벤션
 
 - HTTP 클라이언트: `ky` (axios 사용 금지)
