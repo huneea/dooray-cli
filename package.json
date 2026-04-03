@@ -1,6 +1,6 @@
 {
   "name": "@bifos/dooray-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "CLI tool for Dooray project management — AI agent & terminal friendly",
   "keywords": [
     "dooray",
@@ -21,7 +21,8 @@
     "dooray": "./dist/index.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "engines": {
     "node": ">=18"
