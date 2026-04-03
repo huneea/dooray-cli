@@ -10,7 +10,7 @@
 
 이 세 단계를 거치면 AI 에이전트가 사람의 개입 없이 MVP를 구현할 수 있습니다. 프롬프트 한 줄로 앱을 만드는 것이 아닙니다. **에이전트가 자율적으로 동작할 수 있는 환경을 체계적으로 구축**하는 것입니다.
 
-이 문서는 Claude Code로 dooray-cli(Dooray REST API CLI 도구)의 MVP를 구축한 실제 사례를 바탕으로, 이 방법론을 단계별로 설명합니다.
+이 문서는 Claude Code로 dooray-cli(Dooray REST API CLI 도구)의 MVP를 구축한 실제 사례를 바탕으로, 이 방법론을 단계별로 설명합니다. 전체 코드 및 실행법은 [GitHub 레포지터리](https://github.com/jon890/dooray-cli)에서 확인할 수 있습니다.
 
 > 에이전트가 잘 동작하는 이유는 코드를 잘 짜서가 아니라, **실행 전에 문서가 충분히 정제되어 있기 때문**입니다.
 
@@ -53,6 +53,7 @@
 ### 참고 자료
 
 - [Claude Code로 앱 만들기 — 에이전트 하네스 활용법](https://www.youtube.com/watch?v=OvZiSEZpzxs)
+- [장기 애플리케이션 개발을 위한 하네스 설계](https://www.anthropic.com/engineering/harness-design-long-running-apps)
 
 ### 실제 생성된 산출물 경로
 
