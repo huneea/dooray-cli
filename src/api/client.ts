@@ -1,4 +1,7 @@
 import ky, { type KyInstance, HTTPError } from "ky";
+import { createReadStream } from "node:fs";
+import { readFile, stat } from "node:fs/promises";
+import { basename } from "node:path";
 import { DoorayCliError } from "../utils/errors.js";
 import { EXIT_API_ERROR, EXIT_AUTH_ERROR } from "../utils/exit-codes.js";
 import type {
@@ -28,6 +31,8 @@ import type {
   UpdateWikiPageRequest,
   DoorayApiUnitResponse,
   DoorayErrorResponse,
+  PostFileListResponse,
+  PostFileMetaResponse,
 } from "./types.js";
 
 export interface GetPostsParams {
@@ -100,12 +105,14 @@ async function toDoorayCliError(error: unknown): Promise<never> {
 
 export class DoorayApiClient {
   private readonly api: KyInstance;
+  private readonly authHeader: string;
 
   constructor(apiKey: string, baseUrl: string) {
+    this.authHeader = `dooray-api ${apiKey}`;
     this.api = ky.create({
       prefixUrl: baseUrl,
       headers: {
-        Authorization: `dooray-api ${apiKey}`,
+        Authorization: this.authHeader,
       },
     });
   }
@@ -381,6 +388,104 @@ export class DoorayApiClient {
     try {
       return await this.api
         .put(`wiki/v1/wikis/${wikiId}/pages/${pageId}`, { json: body })
+        .json<DoorayApiUnitResponse>();
+    } catch (e) {
+      return toDoorayCliError(e);
+    }
+  }
+
+  // ─── Post Files ─────────────────────────────────────
+
+  async getPostFiles(projectId: string, postId: string): Promise<PostFileListResponse> {
+    try {
+      return await this.api
+        .get(`project/v1/projects/${projectId}/posts/${postId}/files`)
+        .json<PostFileListResponse>();
+    } catch (e) {
+      return toDoorayCliError(e);
+    }
+  }
+
+  async getPostFileMeta(projectId: string, postId: string, fileId: string): Promise<PostFileMetaResponse> {
+    try {
+      return await this.api
+        .get(`project/v1/projects/${projectId}/posts/${postId}/files/${fileId}`)
+        .json<PostFileMetaResponse>();
+    } catch (e) {
+      return toDoorayCliError(e);
+    }
+  }
+
+  async downloadPostFile(projectId: string, postId: string, fileId: string): Promise<{ buffer: ArrayBuffer; fileName: string }> {
+    try {
+      const res = await this.api
+        .get(`project/v1/projects/${projectId}/posts/${postId}/files/${fileId}/downloads`, {
+          redirect: "manual",
+        });
+
+      const location = res.headers.get("location");
+      if (!location) {
+        throw new DoorayCliError("파일 다운로드 리다이렉트 URL을 받지 못했습니다.", EXIT_API_ERROR);
+      }
+
+      const fileRes = await ky.get(location, {
+        headers: { Authorization: this.authHeader },
+      });
+
+      const disposition = fileRes.headers.get("content-disposition");
+      let fileName = `file-${fileId}`;
+      if (disposition) {
+        const match = disposition.match(/filename\*?=(?:UTF-8''|"?)([^";]+)/i);
+        if (match) fileName = decodeURIComponent(match[1].replace(/"/g, ""));
+      }
+
+      const buffer = await fileRes.arrayBuffer();
+      return { buffer, fileName };
+    } catch (e) {
+      if (e instanceof DoorayCliError) throw e;
+      return toDoorayCliError(e);
+    }
+  }
+
+  async uploadPostFile(projectId: string, postId: string, filePath: string): Promise<PostFileMetaResponse> {
+    try {
+      const fileName = basename(filePath);
+      const fileBuffer = await readFile(filePath);
+      const fileStat = await stat(filePath);
+
+      const res = await this.api
+        .post(`project/v1/projects/${projectId}/posts/${postId}/files`, {
+          redirect: "manual",
+          json: {
+            name: fileName,
+            size: fileStat.size,
+          },
+        });
+
+      const location = res.headers.get("location");
+      if (!location) {
+        throw new DoorayCliError("파일 업로드 리다이렉트 URL을 받지 못했습니다.", EXIT_API_ERROR);
+      }
+
+      const formData = new FormData();
+      formData.append("file", new Blob([fileBuffer]), fileName);
+
+      const uploadRes = await ky.post(location, {
+        headers: { Authorization: this.authHeader },
+        body: formData,
+      });
+
+      return await uploadRes.json<PostFileMetaResponse>();
+    } catch (e) {
+      if (e instanceof DoorayCliError) throw e;
+      return toDoorayCliError(e);
+    }
+  }
+
+  async deletePostFile(projectId: string, postId: string, fileId: string): Promise<DoorayApiUnitResponse> {
+    try {
+      return await this.api
+        .delete(`project/v1/projects/${projectId}/posts/${postId}/files/${fileId}`)
         .json<DoorayApiUnitResponse>();
     } catch (e) {
       return toDoorayCliError(e);

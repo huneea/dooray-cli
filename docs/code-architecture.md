@@ -79,6 +79,12 @@ src/
         add.ts
         edit.ts
         delete.ts
+      file/
+        list.ts               # 첨부파일 목록
+        download.ts           # 단일 파일 다운로드
+        download-all.ts       # 전체 파일 다운로드
+        upload.ts             # 파일 업로드
+        delete.ts             # 파일 삭제
 
     wiki/
       list.ts

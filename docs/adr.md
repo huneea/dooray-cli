@@ -191,3 +191,20 @@
 - 프로젝트 규모 대비 실익이 크지 않음
 
 **재검토 시점**: 디렉토리 깊이가 4단계 이상으로 증가하거나 대규모 리팩토링 시
+
+## ADR-015: 파일 첨부 API 307 리다이렉트 수동 처리
+
+**결정**: Dooray 파일 업로드/다운로드 시 307 리다이렉트를 수동 처리
+
+**이유**:
+
+- Dooray 파일 API는 307 Temporary Redirect로 실제 파일 서버 URL을 반환
+- 브라우저/HTTP 클라이언트의 자동 리다이렉트는 Authorization 헤더와 요청 body를 strip → 인증 실패
+- `redirect: "manual"`로 첫 응답의 Location 헤더를 캡처한 후, 해당 URL로 Auth 헤더를 포함한 2차 요청 필요
+
+**구현**:
+
+- `ky`의 `redirect: "manual"` 옵션으로 자동 리다이렉트 비활성화
+- Location 헤더에서 리다이렉트 URL 추출
+- 2차 요청 시 동일한 Authorization 헤더 첨부
+- 업로드: FormData + Blob, 다운로드: ArrayBuffer로 수신 후 파일 저장

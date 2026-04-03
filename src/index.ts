@@ -17,6 +17,11 @@ import { commentListCommand } from "./commands/post/comment/list.js";
 import { commentAddCommand } from "./commands/post/comment/add.js";
 import { commentEditCommand } from "./commands/post/comment/edit.js";
 import { commentDeleteCommand } from "./commands/post/comment/delete.js";
+import { fileListCommand } from "./commands/post/file/list.js";
+import { fileDownloadCommand } from "./commands/post/file/download.js";
+import { fileDownloadAllCommand } from "./commands/post/file/download-all.js";
+import { fileUploadCommand } from "./commands/post/file/upload.js";
+import { fileDeleteCommand } from "./commands/post/file/delete.js";
 import { wikiListCommand } from "./commands/wiki/list.js";
 import { wikiPagesCommand } from "./commands/wiki/pages.js";
 import { wikiPageGetCommand } from "./commands/wiki/page-get.js";
@@ -33,7 +38,7 @@ const program = new Command();
 program
   .name("dooray")
   .description("Dooray REST API CLI")
-  .version("0.2.0")
+  .version("0.3.0")
   .option("--json", "JSON 형식으로 출력")
   .option("--quiet", "ID만 출력")
   .option("--no-color", "색상 비활성화");
@@ -69,6 +74,15 @@ commentCommand.addCommand(commentAddCommand);
 commentCommand.addCommand(commentEditCommand);
 commentCommand.addCommand(commentDeleteCommand);
 postCommand.addCommand(commentCommand);
+
+// file 서브커맨드 그룹
+const fileCommand = new Command("file").description("첨부파일 관련 명령");
+fileCommand.addCommand(fileListCommand);
+fileCommand.addCommand(fileDownloadCommand);
+fileCommand.addCommand(fileDownloadAllCommand);
+fileCommand.addCommand(fileUploadCommand);
+fileCommand.addCommand(fileDeleteCommand);
+postCommand.addCommand(fileCommand);
 
 // wiki 커맨드 그룹
 const wikiCommand = new Command("wiki").description("위키 관련 명령");

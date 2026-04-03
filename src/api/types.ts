@@ -125,6 +125,22 @@ export interface PostFile {
   size: number;
 }
 
+export interface PostFileDetail {
+  id: string;
+  name: string;
+  size: number;
+  mimeType: string;
+  createdAt: string;
+  creator: {
+    type: string;
+    member?: { organizationMemberId: string };
+    emailUser?: { emailAddress: string; name: string };
+  };
+}
+
+export type PostFileListResponse = DoorayApiResponse<PostFileDetail[]>;
+export type PostFileMetaResponse = DoorayApiResponse<PostFileDetail>;
+
 export interface Post {
   id: string;
   subject: string;

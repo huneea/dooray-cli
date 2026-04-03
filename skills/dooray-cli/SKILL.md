@@ -62,6 +62,11 @@ dooray doctor                                 # 설정 검증
 | 메일 상세 | `dooray mail get <uid>` |
 | 메일 발송 | `dooray mail send --to "..." --subject "..." --body "..."` |
 | 메일 답장 | `dooray mail reply <uid> --body "..."` |
+| 첨부파일 목록 | `dooray post file list <project> <number>` |
+| 첨부파일 다운로드 | `dooray post file download <project> <number> <file-id>` |
+| 전체 첨부파일 다운로드 | `dooray post file download-all <project> <number>` |
+| 첨부파일 업로드 | `dooray post file upload <project> <number> <file-path>` |
+| 첨부파일 삭제 | `dooray post file delete <project> <number> <file-id>` |
 
 ---
 

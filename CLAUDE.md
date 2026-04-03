@@ -24,7 +24,7 @@ src/
   cache/store.ts        # ~/.dooray/cache/ 디렉토리 기반 캐시 CRUD
   cache/types.ts        # CacheEntry, Cached* 타입
   resolvers/            # me, project, member, workflow, post, wiki resolver
-  commands/             # Commander.js 커맨드 (project, post, wiki, mail, config, cache, doctor)
+  commands/             # Commander.js 커맨드 (project, post, post/file, wiki, mail, config, cache, doctor)
   editor/index.ts       # $EDITOR 연동 + YAML frontmatter 파싱
   formatters/           # 테이블/JSON/quiet 출력
   utils/                # errors, spinner, exit-codes

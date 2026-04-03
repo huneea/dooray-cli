@@ -108,6 +108,28 @@ dooray mail send --to "a@b.com" --subject "HTML 메일" --body "<h1>Hello</h1>" 
 dooray mail reply <uid> --body "답장 내용"
 ```
 
+### 첨부파일
+
+업무에 파일을 첨부하거나, 첨부된 파일을 다운로드할 수 있습니다.
+
+```bash
+# 첨부파일 목록
+dooray post file list <project> <number>
+
+# 파일 다운로드
+dooray post file download <project> <number> <file-id>
+dooray post file download <project> <number> <file-id> -o ./downloads
+
+# 전체 파일 다운로드
+dooray post file download-all <project> <number> -o ./downloads
+
+# 파일 업로드
+dooray post file upload <project> <number> ./report.pdf
+
+# 파일 삭제
+dooray post file delete <project> <number> <file-id>
+```
+
 ## 출력 모드
 
 | 플래그 | 설명 | 용도 |
