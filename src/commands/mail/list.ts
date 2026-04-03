@@ -27,7 +27,7 @@ export const mailListCommand = new Command("list")
       headers: ["UID", "읽음", "날짜", "보낸사람", "제목"],
       rows: mails.map((m) => [
         String(m.uid),
-        m.isRead ? "✓" : chalk.bold("●"),
+        m.isRead ? "✓" : chalk.red("✗"),
         m.date ? m.date.toLocaleDateString("ko-KR") : "",
         m.from.replace(/<.*>/, "").trim() || m.from,
         m.subject,
