@@ -2,9 +2,9 @@
   "name": "v0.5.0-setup-skill-install",
   "description": "dooray setup에서 Claude Code 스킬 설치 + doctor 스킬 검증 + 버전 0.5.0",
   "created_at": "2026-04-14T00:00:00Z",
-  "updated_at": "2026-04-14T00:00:00Z",
-  "status": "pending",
-  "current_phase": 0,
+  "updated_at": "2026-04-14T06:31:14.702799+00:00",
+  "status": "running",
+  "current_phase": 3,
   "total_phases": 3,
   "error_message": null,
   "blocked_reason": null,
@@ -13,24 +13,47 @@
       "number": 1,
       "title": "setup 스킬 설치 + package.json files 필드",
       "file": "phase-01.md",
-      "status": "pending",
-      "allowedTools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep"],
-      "model": "sonnet"
+      "status": "completed",
+      "allowedTools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Glob",
+        "Grep"
+      ],
+      "model": "sonnet",
+      "commitSha": "fd546b1947e4"
     },
     {
       "number": 2,
       "title": "doctor 스킬 검증 + 빌드 검증",
       "file": "phase-02.md",
-      "status": "pending",
-      "allowedTools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep"],
-      "model": "sonnet"
+      "status": "completed",
+      "allowedTools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Glob",
+        "Grep"
+      ],
+      "model": "sonnet",
+      "commitSha": "fd546b1947e4"
     },
     {
       "number": 3,
       "title": "커밋 + push",
       "file": "phase-03.md",
-      "status": "pending",
-      "allowedTools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep"],
+      "status": "running",
+      "allowedTools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Glob",
+        "Grep"
+      ],
       "model": "haiku"
     }
   ]

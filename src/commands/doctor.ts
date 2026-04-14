@@ -1,5 +1,7 @@
 import { Command } from "commander";
 import chalk from "chalk";
+import path from "path";
+import fs from "fs/promises";
 import { getConfig, getConfigOrThrow } from "../config/store.js";
 import { getCacheStats } from "../cache/store.js";
 import { DoorayApiClient } from "../api/client.js";
@@ -41,6 +43,44 @@ export const doctorCommand = new Command("doctor")
     console.log(`  프로젝트:   ${stats.projectCount}개`);
     console.log(`  멤버:       ${stats.memberProjectCount}개 프로젝트`);
     console.log(`  워크플로우: ${stats.workflowProjectCount}개 프로젝트`);
+
+    // Claude Code 스킬 검증
+    const claudeDir = path.join(
+      process.env.HOME ?? process.env.USERPROFILE ?? "",
+      ".claude",
+    );
+    const claudeDirExists = await fs
+      .access(claudeDir)
+      .then(() => true)
+      .catch(() => false);
+
+    if (claudeDirExists) {
+      console.log(chalk.bold("\n🔧 Claude Code 스킬\n"));
+      const skillDst = path.join(claudeDir, "skills", "dooray-cli");
+      try {
+        const stat = await fs.lstat(skillDst);
+        if (stat.isSymbolicLink()) {
+          const target = await fs.readlink(skillDst);
+          const targetExists = await fs
+            .access(target)
+            .then(() => true)
+            .catch(() => false);
+          if (targetExists) {
+            console.log(`  dooray-cli: ${chalk.green("✅ 설치됨 (심볼릭 링크)")}`);
+          } else {
+            console.log(
+              `  dooray-cli: ${chalk.yellow("⚠️ 링크 깨짐 — dooray setup으로 재설치")}`,
+            );
+          }
+        } else {
+          console.log(`  dooray-cli: ${chalk.green("✅ 설치됨 (복사본)")}`);
+        }
+      } catch {
+        console.log(
+          `  dooray-cli: ${chalk.red("❌ 미설치 — dooray setup으로 설치")}`,
+        );
+      }
+    }
 
     // Summary
     console.log();

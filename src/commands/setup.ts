@@ -1,5 +1,7 @@
 import { Command } from "commander";
 import chalk from "chalk";
+import path from "path";
+import fs from "fs/promises";
 import { getConfig, saveConfig } from "../config/store.js";
 import { DoorayApiClient } from "../api/client.js";
 import { ensureMe } from "../resolvers/me.js";
@@ -102,7 +104,62 @@ export const setupCommand = new Command("setup")
         });
       }
 
-      // 7. 저장 (all-or-nothing)
+      // 7. Claude Code 스킬 설치
+      const claudeDir = path.join(
+        process.env.HOME ?? process.env.USERPROFILE ?? "",
+        ".claude",
+      );
+      const claudeDirExists = await fs
+        .access(claudeDir)
+        .then(() => true)
+        .catch(() => false);
+
+      if (claudeDirExists) {
+        const isNpx =
+          /_npx[/\\]/.test(__dirname) ||
+          /\.npm[/\\]_npx/.test(__dirname) ||
+          /npx-/.test(__dirname);
+
+        if (isNpx) {
+          console.log(
+            chalk.yellow(
+              "  ⚠ npx 환경에서는 스킬 설치가 불가합니다. npm i -g @bifos/dooray-cli 후 다시 시도하세요.",
+            ),
+          );
+        } else {
+          const installSkill = await confirm({
+            message: "Claude Code 스킬을 설치하시겠습니까?",
+            default: true,
+            theme: { prefix: "🔧" },
+          });
+
+          if (installSkill) {
+            try {
+              const skillSrc = path.resolve(__dirname, "../skills/dooray-cli");
+              const skillsDir = path.join(claudeDir, "skills");
+              const skillDst = path.join(skillsDir, "dooray-cli");
+
+              await fs.mkdir(skillsDir, { recursive: true });
+
+              await fs
+                .lstat(skillDst)
+                .then(() => fs.rm(skillDst, { recursive: true, force: true }))
+                .catch(() => {});
+
+              await fs.symlink(skillSrc, skillDst);
+              console.log(chalk.green("  ✓ Claude Code 스킬 설치 완료"));
+            } catch (err) {
+              console.log(
+                chalk.yellow(
+                  `  ⚠ 스킬 설치 실패: ${err instanceof Error ? err.message : String(err)}`,
+                ),
+              );
+            }
+          }
+        }
+      }
+
+      // 8. 저장 (all-or-nothing)
       const config: Config = {
         version: 1,
         apiKey,
