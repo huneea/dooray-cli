@@ -75,10 +75,10 @@ dooray doctor                                 # 설정 검증
 
 1. **"내 프로젝트", "개인 프로젝트" 언급 시** → `dooray project list --type private --json` 으로 개인 프로젝트 먼저 조회
 2. **프로젝트 코드를 모르면** → `dooray project list --search <keyword>` 로 먼저 찾기
-2. **업무 번호를 모르면** → `dooray post search <project> "<keyword>"` 로 검색
-3. **워크플로우 이름을 모르면** → `dooray project workflows <project>` 로 확인
-4. **멤버 이름을 모르면** → `dooray project members <project>` 로 확인
-5. **결과를 다음 액션에 사용하려면** → `--json` 플래그로 구조화된 데이터 획득
+3. **업무 번호를 모르면** → `dooray post search <project> "<keyword>"` 로 검색
+4. **워크플로우 이름을 모르면** → `dooray project workflows <project>` 로 확인
+5. **멤버 이름을 모르면** → `dooray project members <project>` 로 확인
+6. **결과를 다음 액션에 사용하려면** → `--json` 플래그로 구조화된 데이터 획득
 
 ---
 
