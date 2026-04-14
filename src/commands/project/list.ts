@@ -1,4 +1,4 @@
-import { Command } from "commander";
+import { Command, Option } from "commander";
 import { getConfigOrThrow } from "../../config/store.js";
 import { DoorayApiClient } from "../../api/client.js";
 import { ensureProjects, ensurePrivateProjects } from "../../resolvers/project.js";
@@ -8,7 +8,11 @@ import { startSpinner, stopSpinner } from "../../utils/spinner.js";
 export const projectListCommand = new Command("list")
   .description("프로젝트 목록 조회")
   .option("-s, --search <keyword>", "code 필터링")
-  .option("-t, --type <type>", "프로젝트 타입 필터 (public|private)", "public")
+  .addOption(
+    new Option("-t, --type <type>", "프로젝트 타입 필터")
+      .choices(["public", "private"])
+      .default("public"),
+  )
   .action(async (opts) => {
     const globalOpts = projectListCommand.optsWithGlobals() as OutputOptions;
     const config = await getConfigOrThrow();
