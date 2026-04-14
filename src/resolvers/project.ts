@@ -57,8 +57,15 @@ export async function resolveProject(
   const match = projects.find((p) => p.code === input || p.id === input);
   if (match) return match.id;
 
+  // private 캐시가 있으면 추가 검색 (캐시 미스 시 API 호출 없음)
+  const privateCached = await getPrivateProjects();
+  if (privateCached && !isExpired(privateCached.updatedAt, PROJECTS_TTL_MS)) {
+    const privateMatch = privateCached.data.find((p) => p.code === input || p.id === input);
+    if (privateMatch) return privateMatch.id;
+  }
+
   throw new DoorayCliError(
-    `프로젝트를 찾을 수 없습니다: ${input}\n  개인 프로젝트라면: dooray project list --type private 로 확인하세요`,
+    `프로젝트를 찾을 수 없습니다: ${input}\n  개인 프로젝트라면: dooray project list --type private 로 캐시를 갱신하세요`,
     EXIT_PARAM_ERROR,
   );
 }
