@@ -2,8 +2,8 @@
   "name": "v0.5.0-setup-skill-install",
   "description": "dooray setup에서 Claude Code 스킬 설치 + doctor 스킬 검증 + 버전 0.5.0",
   "created_at": "2026-04-14T00:00:00Z",
-  "updated_at": "2026-04-14T06:31:14.702799+00:00",
-  "status": "running",
+  "updated_at": "2026-04-14T06:31:50.714286+00:00",
+  "status": "completed",
   "current_phase": 3,
   "total_phases": 3,
   "error_message": null,
@@ -45,7 +45,7 @@
       "number": 3,
       "title": "커밋 + push",
       "file": "phase-03.md",
-      "status": "running",
+      "status": "completed",
       "allowedTools": [
         "Read",
         "Write",
@@ -54,7 +54,8 @@
         "Glob",
         "Grep"
       ],
-      "model": "haiku"
+      "model": "haiku",
+      "commitSha": "871fec3a3bb0"
     }
   ]
 }
