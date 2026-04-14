@@ -12,6 +12,7 @@ import type {
 const CACHE_DIR = join(homedir(), ".dooray", "cache");
 const ME_PATH = join(CACHE_DIR, "me.json");
 const PROJECTS_PATH = join(CACHE_DIR, "projects.json");
+const PROJECTS_PRIVATE_PATH = join(CACHE_DIR, "projects-private.json");
 const MEMBERS_DIR = join(CACHE_DIR, "members");
 const WORKFLOWS_DIR = join(CACHE_DIR, "workflows");
 
@@ -63,6 +64,14 @@ export async function getProjects(): Promise<CacheEntry<CachedProject[]> | null>
 
 export async function setProjects(items: CachedProject[]): Promise<void> {
   await writeJson(PROJECTS_PATH, { updatedAt: now(), data: items } satisfies CacheEntry<CachedProject[]>);
+}
+
+export async function getPrivateProjects(): Promise<CacheEntry<CachedProject[]> | null> {
+  return readJson<CacheEntry<CachedProject[]>>(PROJECTS_PRIVATE_PATH);
+}
+
+export async function setPrivateProjects(items: CachedProject[]): Promise<void> {
+  await writeJson(PROJECTS_PRIVATE_PATH, { updatedAt: now(), data: items } satisfies CacheEntry<CachedProject[]>);
 }
 
 // ─── Members (per project) ────────────────────────────────

@@ -1,17 +1,20 @@
 import { DoorayApiClient } from "../api/client.js";
 import type { CachedProject } from "../cache/types.js";
-import { getProjects, setProjects, isExpired } from "../cache/store.js";
+import { getProjects, setProjects, getPrivateProjects, setPrivateProjects, isExpired } from "../cache/store.js";
 import { PROJECTS_TTL_MS } from "../cache/types.js";
 import { DoorayCliError } from "../utils/errors.js";
 import { EXIT_PARAM_ERROR } from "../utils/exit-codes.js";
 
-async function fetchAllProjects(client: DoorayApiClient): Promise<CachedProject[]> {
+async function fetchAllProjects(
+  client: DoorayApiClient,
+  options?: { type?: string },
+): Promise<CachedProject[]> {
   const all: CachedProject[] = [];
   let page = 0;
   const size = 100;
 
   while (true) {
-    const res = await client.getProjects({ page, size });
+    const res = await client.getProjects({ page, size, type: options?.type });
     for (const p of res.result) {
       all.push({
         id: p.id,
@@ -36,17 +39,26 @@ export async function ensureProjects(client: DoorayApiClient): Promise<CachedPro
   return items;
 }
 
+export async function ensurePrivateProjects(client: DoorayApiClient): Promise<CachedProject[]> {
+  const entry = await getPrivateProjects();
+  if (entry && !isExpired(entry.updatedAt, PROJECTS_TTL_MS)) {
+    return entry.data;
+  }
+  const items = await fetchAllProjects(client, { type: "private" });
+  await setPrivateProjects(items);
+  return items;
+}
+
 export async function resolveProject(
   client: DoorayApiClient,
   input: string,
 ): Promise<string> {
   const projects = await ensureProjects(client);
-
   const match = projects.find((p) => p.code === input || p.id === input);
   if (match) return match.id;
 
   throw new DoorayCliError(
-    `프로젝트를 찾을 수 없습니다: ${input}`,
+    `프로젝트를 찾을 수 없습니다: ${input}\n  개인 프로젝트라면: dooray project list --type private 로 확인하세요`,
     EXIT_PARAM_ERROR,
   );
 }

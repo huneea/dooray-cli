@@ -34,8 +34,9 @@ dooray doctor
 ### 프로젝트
 
 ```bash
-dooray project list                        # 프로젝트 목록
+dooray project list                        # 프로젝트 목록 (기본: public)
 dooray project list --search ocr           # 코드로 검색
+dooray project list --type private         # 개인 프로젝트 목록
 dooray project members tc-ocr              # 멤버 목록
 dooray project workflows tc-ocr            # 워크플로우 목록
 ```
