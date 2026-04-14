@@ -21,6 +21,9 @@ dooray setup
 ? IMAP 사용자 이메일 (설정 확인: https://nhnent.dooray.com/setting/mail/general/read) user@nhn.com
 ? IMAP 비밀번호 ****
 
+? Claude Code 스킬을 설치하시겠습니까? (Y/n) Y
+✓ 스킬 설치 완료: ~/.claude/skills/dooray-cli
+
 ✓ 설정 완료. dooray doctor로 상태를 확인할 수 있습니다.
 ```
 
@@ -30,7 +33,8 @@ dooray setup
 3. API Key 입력 (마스킹, 발급 링크 안내)
 4. API 연결 테스트 → 실패 시 재입력 유도
 5. 메일 사용 여부 → Y: IMAP 계정·비밀번호 입력 / n: 건너뛰기
-6. 모든 입력 완료 후 config.json에 한 번에 저장 (Ctrl+C 시 저장 안 됨)
+6. Claude Code 스킬 설치 여부 → Y: `~/.claude/skills/dooray-cli` 심볼릭 링크 생성 / n: 건너뛰기
+7. 모든 입력 완료 후 config.json에 한 번에 저장 (Ctrl+C 시 저장 안 됨)
 
 재실행 시 기존 설정값이 기본값으로 표시된다.
 

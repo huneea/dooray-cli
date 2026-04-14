@@ -248,3 +248,32 @@
 - `client.ts`에서 한 파일로 모든 타입을 import하는 현재 구조가 간결
 
 **재검토 시점**: 800줄 이상이거나 새 도메인(Drive 등)이 2개 이상 추가될 때
+
+---
+
+## ADR-018: `dooray setup`에서 Claude Code 스킬 설치
+
+**결정**: `dooray setup` 마지막 단계에서 Claude Code 스킬 설치 여부를 물어보고, 심볼릭 링크로 설치
+
+**이유**:
+
+- 별도 `dooray install skills` 커맨드 대신 setup 한 곳에서 완결하는 게 UX가 간결
+- 심볼릭 링크 방식으로 `npm update -g` 시 스킬도 자동 최신화 (유지보수 비용 0)
+- 기존 `~/.claude/skills/` 폴더의 다른 스킬들(gstack 등)도 전부 심볼릭 링크 패턴 → 일관성
+
+**설치 메커니즘**:
+
+- 원본 경로: `__dirname` 기반으로 `../skills/dooray-cli/` 참조 (tsup 번들이 `dist/`에 위치)
+- 설치 경로: `~/.claude/skills/dooray-cli` → 원본 경로로 심볼릭 링크
+- 재실행 시: 기존 링크 삭제 후 재생성 (idempotent)
+- npx 환경: 임시 경로 감지 시 경고 + 건너뛰기 (global install 전용)
+
+**doctor 검증**:
+
+- 심볼릭 링크 → 유효성 체크 (링크 대상 존재 여부)
+- 일반 파일 → 패키지 원본과 해시 비교로 최신 여부 판단
+- 미설치 → `dooray setup` 안내
+
+**package.json**: `files` 필드에 `skills/` 추가 필수 (npm publish 시 포함)
+
+**스킬 포맷**: Claude Code 전용 (SKILL.md frontmatter 규격). 타 에이전트(Cursor, Windsurf 등) 지원은 요청 시 확장

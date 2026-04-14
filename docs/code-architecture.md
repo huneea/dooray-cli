@@ -58,7 +58,7 @@ src/
     exit-codes.ts           # 0 성공 / 1 API오류 / 2 인증실패 / 3 파라미터오류 / 4 설정오류
 
   commands/
-    setup.ts                # dooray setup — 대화형 초기 설정 마법사
+    setup.ts                # dooray setup — 대화형 초기 설정 마법사 (스킬 설치 포함)
     config.ts               # dooray config set|get
     doctor.ts               # dooray doctor
     cache.ts                # dooray cache clear|refresh
@@ -111,7 +111,7 @@ commands/* → utils/errors
 editor/    → api/client (현재 데이터 fetch) + resolvers/member
 ```
 
-- `commands/setup.ts`는 config/store + api/client + @inquirer/prompts 의존
+- `commands/setup.ts`는 config/store + api/client + @inquirer/prompts 의존 + fs(심볼릭 링크 생성)
 - `api/client`는 순수 HTTP 래퍼. 비즈니스 로직 없음
 - `resolvers/*`는 캐시 우선 조회, 만료 시 api/client 호출
 - `commands/*`는 resolvers + api/client + formatters 조합

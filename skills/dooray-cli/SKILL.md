@@ -15,6 +15,14 @@ npm install -g @bifos/dooray-cli
 
 ## 초기 설정
 
+대화형 마법사로 한 번에 설정:
+
+```bash
+dooray setup   # API endpoint 선택, API key 입력, 메일 설정까지 대화형으로 진행
+```
+
+또는 개별 수동 설정:
+
 ```bash
 dooray config set base-url https://api.dooray.com
 dooray config set api-key <YOUR_API_TOKEN>   # https://{org}.dooray.com/setting/api/token
@@ -39,6 +47,7 @@ dooray doctor                                 # 설정 검증
 
 | 의도 | 커맨드 |
 |------|--------|
+| 초기 설정 (대화형) | `dooray setup` |
 | 프로젝트 찾기 | `dooray project list --search <keyword>` |
 | 개인 프로젝트 목록 | `dooray project list --type private` |
 | 프로젝트 멤버 보기 | `dooray project members <project>` |
