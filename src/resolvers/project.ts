@@ -5,13 +5,16 @@ import { PROJECTS_TTL_MS } from "../cache/types.js";
 import { DoorayCliError } from "../utils/errors.js";
 import { EXIT_PARAM_ERROR } from "../utils/exit-codes.js";
 
-async function fetchAllProjects(client: DoorayApiClient): Promise<CachedProject[]> {
+async function fetchAllProjects(
+  client: DoorayApiClient,
+  options?: { type?: string },
+): Promise<CachedProject[]> {
   const all: CachedProject[] = [];
   let page = 0;
   const size = 100;
 
   while (true) {
-    const res = await client.getProjects({ page, size });
+    const res = await client.getProjects({ page, size, type: options?.type });
     for (const p of res.result) {
       all.push({
         id: p.id,
@@ -26,7 +29,14 @@ async function fetchAllProjects(client: DoorayApiClient): Promise<CachedProject[
   return all;
 }
 
-export async function ensureProjects(client: DoorayApiClient): Promise<CachedProject[]> {
+export async function ensureProjects(
+  client: DoorayApiClient,
+  options?: { type?: string },
+): Promise<CachedProject[]> {
+  // public이 아닌 타입(private 등) 조회 시 캐시 우회
+  if (options?.type && options.type !== "public") {
+    return fetchAllProjects(client, options);
+  }
   const entry = await getProjects();
   if (entry && !isExpired(entry.updatedAt, PROJECTS_TTL_MS)) {
     return entry.data;
@@ -40,10 +50,15 @@ export async function resolveProject(
   client: DoorayApiClient,
   input: string,
 ): Promise<string> {
+  // public 프로젝트에서 먼저 검색
   const projects = await ensureProjects(client);
-
   const match = projects.find((p) => p.code === input || p.id === input);
   if (match) return match.id;
+
+  // private 프로젝트에서 검색
+  const privateProjects = await ensureProjects(client, { type: "private" });
+  const privateMatch = privateProjects.find((p) => p.code === input || p.id === input);
+  if (privateMatch) return privateMatch.id;
 
   throw new DoorayCliError(
     `프로젝트를 찾을 수 없습니다: ${input}`,
