@@ -5,6 +5,7 @@ import { resolveProject } from "../../resolvers/project.js";
 import { formatPostList } from "../../formatters/post.js";
 import type { OutputOptions } from "../../formatters/table.js";
 import type { Post } from "../../api/types.js";
+import { ensureTags } from "../../resolvers/tag.js";
 import { startSpinner, stopSpinner } from "../../utils/spinner.js";
 
 export const postListCommand = new Command("list")
@@ -46,6 +47,14 @@ export const postListCommand = new Command("list")
         size: Number(opts.size),
       });
       posts = res.result;
+    }
+
+    const tags = await ensureTags(client, projectId);
+    const tagMap = new Map(tags.map((t) => [t.id, t.name]));
+    for (const post of posts) {
+      for (const tag of post.tags) {
+        tag.name = tagMap.get(tag.id);
+      }
     }
 
     stopSpinner(true, "업무 목록 조회 완료");

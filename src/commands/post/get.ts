@@ -3,6 +3,7 @@ import { getConfigOrThrow } from "../../config/store.js";
 import { DoorayApiClient } from "../../api/client.js";
 import { resolveProject } from "../../resolvers/project.js";
 import { resolvePost } from "../../resolvers/post.js";
+import { ensureTags } from "../../resolvers/tag.js";
 import { formatPostDetail } from "../../formatters/post.js";
 import type { OutputOptions } from "../../formatters/table.js";
 import { startSpinner, stopSpinner } from "../../utils/spinner.js";
@@ -20,6 +21,11 @@ export const postGetCommand = new Command("get")
     const projectId = await resolveProject(client, project);
     const postId = await resolvePost(client, projectId, Number(postNumberStr));
     const res = await client.getPost(projectId, postId);
+    const tags = await ensureTags(client, projectId);
+    const tagMap = new Map(tags.map((t) => [t.id, t.name]));
+    for (const tag of res.result.tags) {
+      tag.name = tagMap.get(tag.id);
+    }
     stopSpinner(true, "업무 조회 완료");
 
     formatPostDetail(res.result, globalOpts);
