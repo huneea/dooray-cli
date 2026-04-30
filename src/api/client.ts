@@ -22,6 +22,7 @@ import type {
   DeleteCommentResponse,
   ProjectMemberListResponse,
   ProjectWorkflowListResponse,
+  ProjectTagListResponse,
   MemberDetailResponse,
   WikiListResponse,
   WikiPagesResponse,
@@ -331,6 +332,18 @@ export class DoorayApiClient {
       return await this.api
         .get(`project/v1/projects/${projectId}/workflows`)
         .json<ProjectWorkflowListResponse>();
+    } catch (e) {
+      return toDoorayCliError(e);
+    }
+  }
+
+  // ─── Tags ───────────────────────────────────────────
+
+  async getProjectTags(projectId: string): Promise<ProjectTagListResponse> {
+    try {
+      return await this.api
+        .get(`project/v1/projects/${projectId}/tags`)
+        .json<ProjectTagListResponse>();
     } catch (e) {
       return toDoorayCliError(e);
     }

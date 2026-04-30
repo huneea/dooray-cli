@@ -4,12 +4,13 @@ import { output, printJson } from "./table.js";
 
 export function formatPostList(posts: Post[], opts: OutputOptions): void {
   output(opts, {
-    headers: ["Number", "Subject", "Workflow", "Priority", "Assignee"],
+    headers: ["Number", "Subject", "Workflow", "Priority", "Tags", "Assignee"],
     rows: posts.map((p) => [
       String(p.number),
       p.subject,
       p.workflow.name,
       p.priority,
+      p.tags.map((t) => t.name ?? t.id).join(", "),
       p.users.to.map((u) => u.member?.name ?? u.emailUser?.name ?? "").filter(Boolean).join(", "),
     ]),
     raw: posts,
@@ -30,6 +31,7 @@ export function formatPostDetail(post: PostDetail, opts: OutputOptions): void {
     `우선순위: ${post.priority}`,
     `작성자: ${post.users.from.member?.name ?? ""}`,
     `담당자: ${post.users.to.map((u) => u.member?.name ?? "").filter(Boolean).join(", ")}`,
+    `태그: ${post.tags.length > 0 ? post.tags.map((t) => t.name ?? t.id).join(", ") : "없음"}`,
     `생성: ${post.createdAt}`,
     `수정: ${post.updatedAt}`,
     "",

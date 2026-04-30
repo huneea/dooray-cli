@@ -7,6 +7,7 @@ import type {
   CachedProject,
   CachedMember,
   CachedWorkflow,
+  CachedTag,
 } from "./types.js";
 
 const CACHE_DIR = join(homedir(), ".dooray", "cache");
@@ -15,6 +16,7 @@ const PROJECTS_PATH = join(CACHE_DIR, "projects.json");
 const PROJECTS_PRIVATE_PATH = join(CACHE_DIR, "projects-private.json");
 const MEMBERS_DIR = join(CACHE_DIR, "members");
 const WORKFLOWS_DIR = join(CACHE_DIR, "workflows");
+const TAGS_DIR = join(CACHE_DIR, "tags");
 
 // ─── Helpers ──────────────────────────────────────────────
 
@@ -102,6 +104,20 @@ export async function setWorkflows(projectId: string, items: CachedWorkflow[]): 
   await writeJson(workflowsPath(projectId), { updatedAt: now(), data: items } satisfies CacheEntry<CachedWorkflow[]>);
 }
 
+// ─── Tags (per project) ──────────────────────────────────
+
+function tagsPath(projectId: string): string {
+  return join(TAGS_DIR, `${projectId}.json`);
+}
+
+export async function getTags(projectId: string): Promise<CacheEntry<CachedTag[]> | null> {
+  return readJson<CacheEntry<CachedTag[]>>(tagsPath(projectId));
+}
+
+export async function setTags(projectId: string, items: CachedTag[]): Promise<void> {
+  await writeJson(tagsPath(projectId), { updatedAt: now(), data: items } satisfies CacheEntry<CachedTag[]>);
+}
+
 // ─── Clear ────────────────────────────────────────────────
 
 export async function clearCache(): Promise<void> {
@@ -118,6 +134,7 @@ export async function getCacheStats(): Promise<{
   projectCount: number;
   memberProjectCount: number;
   workflowProjectCount: number;
+  tagProjectCount: number;
   me: CachedMe | null;
 }> {
   const projects = await getProjects();
@@ -135,7 +152,13 @@ export async function getCacheStats(): Promise<{
     workflowProjectCount = files.filter((f) => f.endsWith(".json")).length;
   } catch { /* dir doesn't exist */ }
 
+  let tagProjectCount = 0;
+  try {
+    const files = await readdir(TAGS_DIR);
+    tagProjectCount = files.filter((f) => f.endsWith(".json")).length;
+  } catch { /* dir doesn't exist */ }
+
   const me = await getMe();
 
-  return { projectCount, memberProjectCount, workflowProjectCount, me: me?.data ?? null };
+  return { projectCount, memberProjectCount, workflowProjectCount, tagProjectCount, me: me?.data ?? null };
 }

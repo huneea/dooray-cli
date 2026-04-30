@@ -7,6 +7,7 @@ import { resolveMember } from "../../resolvers/member.js";
 import { startSpinner, stopSpinner } from "../../utils/spinner.js";
 import { DoorayCliError } from "../../utils/errors.js";
 import { EXIT_PARAM_ERROR } from "../../utils/exit-codes.js";
+import { resolveTag } from "../../resolvers/tag.js";
 import type { CreatePostUser } from "../../api/types.js";
 import type { OutputOptions } from "../../formatters/table.js";
 import { printJson } from "../../formatters/table.js";
@@ -59,6 +60,7 @@ export const postCreateCommand = new Command("create")
   .option("--cc <members...>", "참조자 (이름 또는 이메일, 여러 명 가능)")
   .option("--body <text>", "본문 텍스트 (- 입력 시 stdin에서 읽기)")
   .option("--body-file <path>", "본문 파일 경로 (- 입력 시 stdin에서 읽기)")
+  .option("--tag <tags...>", "태그 (이름 또는 ID, 여러 개 가능)")
   .option("--priority <level>", "우선순위 (highest, high, normal, low, lowest)", "normal")
   .option("--due-date <date>", "마감일 (ISO 8601 형식)")
   .action(async (project, opts) => {
@@ -74,11 +76,19 @@ export const postCreateCommand = new Command("create")
     const toUsers = opts.to ? await resolveUsers(client, projectId, opts.to) : [];
     const ccUsers = opts.cc ? await resolveUsers(client, projectId, opts.cc) : [];
 
+    const tagIds: string[] = [];
+    if (opts.tag) {
+      for (const t of opts.tag) {
+        tagIds.push(await resolveTag(client, projectId, t));
+      }
+    }
+
     const res = await client.createPost(projectId, {
       subject: opts.subject,
       body: { mimeType: "text/x-markdown", content: bodyContent },
       users: { to: toUsers, cc: ccUsers },
       priority: opts.priority,
+      ...(tagIds.length > 0 && { tagIds }),
       ...(opts.dueDate && { dueDate: opts.dueDate, dueDateFlag: true }),
     });
     stopSpinner(true, "업무 생성 완료");

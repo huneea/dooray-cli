@@ -30,3 +30,12 @@ export interface CachedWorkflow {
   class: "backlog" | "registered" | "working" | "closed";
   order?: number;
 }
+
+export const TAGS_TTL_MS = 86_400_000; // 24h
+
+export interface CachedTag {
+  id: string;
+  name: string;
+  prefix?: string;
+  color?: string;
+}

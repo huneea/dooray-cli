@@ -78,6 +78,7 @@ export interface Milestone {
 
 export interface Tag {
   id: string;
+  name?: string;
 }
 
 export interface Workflow {
@@ -349,6 +350,21 @@ export interface ProjectWorkflow {
 export interface ProjectWorkflowListResponse {
   header: DoorayApiHeader;
   result: ProjectWorkflow[];
+}
+
+// ─── Project Tag ────────────────────────────────────────
+
+export interface ProjectTag {
+  id: string;
+  name: string;
+  prefix?: string;
+  color?: string;
+}
+
+export interface ProjectTagListResponse {
+  header: DoorayApiHeader;
+  result: ProjectTag[];
+  totalCount: number;
 }
 
 // ─── Wiki ───────────────────────────────────────────────

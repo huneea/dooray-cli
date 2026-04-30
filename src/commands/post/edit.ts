@@ -105,6 +105,7 @@ export const postEditCommand = new Command("edit")
         priority: post.priority,
         dueDate: post.dueDate,
         dueDateFlag: post.dueDateFlag,
+        tagIds: post.tags.map((t) => t.id),
         users: { to: toUsers, cc: ccUsers },
       });
       stopSpinner(true, "업무 수정 완료");
@@ -130,6 +131,7 @@ export const postEditCommand = new Command("edit")
         priority: parsed.priority,
         dueDate: parsed.due_date ?? undefined,
         dueDateFlag: parsed.due_date != null,
+        tagIds: post.tags.map((t) => t.id),
         users: { to: toUsers, cc: ccUsers },
       });
       stopSpinner(true, "업무 수정 완료");
