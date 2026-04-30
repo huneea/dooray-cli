@@ -339,10 +339,15 @@ export class DoorayApiClient {
 
   // ─── Tags ───────────────────────────────────────────
 
-  async getProjectTags(projectId: string): Promise<ProjectTagListResponse> {
+  async getProjectTags(projectId: string, params?: { page?: number; size?: number }): Promise<ProjectTagListResponse> {
     try {
       return await this.api
-        .get(`project/v1/projects/${projectId}/tags`)
+        .get(`project/v1/projects/${projectId}/tags`, {
+          searchParams: {
+            ...(params?.page != null && { page: params.page }),
+            ...(params?.size != null && { size: params.size }),
+          },
+        })
         .json<ProjectTagListResponse>();
     } catch (e) {
       return toDoorayCliError(e);

@@ -354,11 +354,18 @@ export interface ProjectWorkflowListResponse {
 
 // ─── Project Tag ────────────────────────────────────────
 
+export interface TagGroup {
+  id: string;
+  name: string;
+  mandatory: boolean;
+  selectOne: boolean;
+}
+
 export interface ProjectTag {
   id: string;
   name: string;
-  prefix?: string;
-  color?: string;
+  color: string;
+  tagGroup: TagGroup | null;
 }
 
 export interface ProjectTagListResponse {

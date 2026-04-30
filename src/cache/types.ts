@@ -33,9 +33,16 @@ export interface CachedWorkflow {
 
 export const TAGS_TTL_MS = 86_400_000; // 24h
 
+export interface CachedTagGroup {
+  id: string;
+  name: string;
+  mandatory: boolean;
+  selectOne: boolean;
+}
+
 export interface CachedTag {
   id: string;
   name: string;
-  prefix?: string;
-  color?: string;
+  color: string;
+  tagGroup: CachedTagGroup | null;
 }

@@ -20,12 +20,13 @@ export const projectTagsCommand = new Command("tags")
     stopSpinner(true, "태그 목록 조회 완료");
 
     output(globalOpts, {
-      headers: ["ID", "Name", "Prefix", "Color"],
+      headers: ["ID", "Name", "Group", "Mandatory", "Color"],
       rows: tags.map((t) => [
         t.id,
         t.name,
-        t.prefix ?? "",
-        t.color ?? "",
+        t.tagGroup?.name ?? "",
+        t.tagGroup?.mandatory ? "Y" : "",
+        t.color,
       ]),
       raw: tags,
       ids: tags.map((t) => t.id),
